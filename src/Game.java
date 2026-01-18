@@ -90,7 +90,7 @@ public class Game extends JPanel
         // ===== PLAYER =====
         player.draw(g);
 
-        // ===== AMMO COUNTER =====
+        // ===== AMMO COUNTER =====aaaa
         g.setFont(new Font("Monospaced", Font.BOLD, 24));
         g.setColor(Color.WHITE);
         String ammoText = player.gun.ammo + " / " + player.gun.magSize;
