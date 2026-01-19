@@ -74,9 +74,9 @@ public class Game extends JPanel
         frame.setVisible(true);
 
         // Spawn elements
+        spawnBuildings(30);
         spawnAKs(20);
         spawnEnemySpawners(500);
-        spawnBuildings(30);
 
         // Set focus and start timer
         requestFocus();
@@ -206,7 +206,7 @@ public class Game extends JPanel
 
         // Update enemy spawners
         for (EnemySpawner es : enemySpawners) {
-            es.update(player.x, player.y, enemies);
+            es.update(player.x, player.y, enemies, buildings);
         } // End for loop
 
         // Update enemies

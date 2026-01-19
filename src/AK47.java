@@ -6,7 +6,10 @@
  * Description: Automatic rifle weapon with 30 round magazine.
  */
 
+// AK47 class
 public class AK47 extends Gun {
+
+    // Initialize AK47 weapon stats
     @Override
     protected void initStats() {
         length = 40;
@@ -14,5 +17,5 @@ public class AK47 extends Gun {
         fireDelay = 10;
         reloadTime = 90;
         automatic = true;
-    }
-}
+    } // End method
+} // End class

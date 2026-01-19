@@ -6,8 +6,10 @@
  * Description: Semi-automatic pistol weapon with 17 round magazine.
  */
 
+// Glock17 class
 public class Glock17 extends Gun {
 
+    // Initialize Glock17 weapon stats
     @Override
     protected void initStats() {
         length = 30;
@@ -15,5 +17,5 @@ public class Glock17 extends Gun {
         fireDelay = 8;
         reloadTime = 60;
         automatic = false;
-    }
-}
+    } // End method
+} // End class

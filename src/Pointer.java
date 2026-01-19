@@ -6,16 +6,20 @@
  * Description: On-screen navigation arrow that points toward the helicopter.
  */
 
+// Import statement
 import java.awt.*;
 
+// Pointer class
 public class Pointer {
-    
+    // Draw navigation pointer arrow
     void draw(Graphics g, int playerX, int playerY, int heliX, int heliY, int screenW, int screenH) {
+        // Calculate direction to helicopter
         int dx = heliX - playerX;
         int dy = heliY - playerY;
         
         double angle = Math.atan2(dy, dx);
         
+        // Calculate pointer position on screen edge
         int margin = 60;
         int centerX = screenW / 2;
         int centerY = screenH / 2;
@@ -28,6 +32,7 @@ public class Pointer {
         Graphics2D g2 = (Graphics2D) g;
         g2.setStroke(new BasicStroke(3));
         
+        // Calculate arrow points
         int arrowSize = 20;
         int[] xPoints = new int[3];
         int[] yPoints = new int[3];
@@ -41,6 +46,7 @@ public class Pointer {
         xPoints[2] = pointerX + (int)(Math.cos(angle - 2.5) * arrowSize * 0.6);
         yPoints[2] = pointerY + (int)(Math.sin(angle - 2.5) * arrowSize * 0.6);
         
+        // Draw arrow
         g2.setColor(new Color(0, 200, 0));
         g2.fillPolygon(xPoints, yPoints, 3);
         
@@ -48,5 +54,5 @@ public class Pointer {
         g2.drawPolygon(xPoints, yPoints, 3);
         
         g2.setStroke(new BasicStroke(1));
-    }
-}
+    } // End method
+} // End class
