@@ -74,7 +74,7 @@ public class Game extends JPanel
         frame.setVisible(true);
 
         // Spawn elements
-        spawnBuildings(30);
+        spawnBuildings(200);
         spawnAKs(20);
         spawnEnemySpawners(500);
 
@@ -136,12 +136,21 @@ public class Game extends JPanel
         // Loop to create buildings
         for (int i = 0; i < amount; i++) {
             int size = (r.nextInt(3) + 2) * TILE;
-            buildings.add(new Building(
-                r.nextInt(WORLD_W - size),
-                r.nextInt(WORLD_H - size),
-                size,
-                size
-            ));
+            int x, y;
+            boolean validSpawn;
+            do {
+                x = r.nextInt(WORLD_W - size);
+                y = r.nextInt(WORLD_H - size);
+                // Check if building would spawn near player spawn location
+                int playerSpawnX = WORLD_W / 16;
+                int playerSpawnY = WORLD_H - (WORLD_H / 16);
+                int playerSize = 40;
+                int spacing = 200; // Safe spacing around player spawn
+                validSpawn = !(x + size > playerSpawnX - spacing && x < playerSpawnX + playerSize + spacing &&
+                               y + size > playerSpawnY - spacing && y < playerSpawnY + playerSize + spacing);
+            } while (!validSpawn);
+            
+            buildings.add(new Building(x, y, size, size));
         } // End for loop
     } // End method
 
@@ -206,7 +215,7 @@ public class Game extends JPanel
 
         // Update enemy spawners
         for (EnemySpawner es : enemySpawners) {
-            es.update(player.x, player.y, enemies, buildings);
+            es.update(player.x, player.y, enemies);
         } // End for loop
 
         // Update enemies
@@ -459,9 +468,10 @@ public class Game extends JPanel
         escaped = false;
         startTime = System.currentTimeMillis();
         
+        // Spawn elements
         spawnAKs(20);
         spawnEnemySpawners(500);
-        spawnBuildings(30);
+        spawnBuildings(100);
         
         timer.start();
     } // End method
