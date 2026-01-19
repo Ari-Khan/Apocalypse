@@ -4,6 +4,11 @@
  * Version: 1.0.0
  * Date: 2025-01-18
  * Description: Main game class for the Apocalypse game.
+ * Identity: I've been playing survival games for years, and I wanted to make my own to demonstrate my proficiency in Java programming and development concepts. This project showcases my ability to create a complex, interactive application with graphics, user input handling, and game mechanics.
+ * Purpose: The purpose of this project is to create an engaging 2D survival game where the player must navigate a post-apocalyptic world, avoid enemies, collect weapons, and reach a helicopter to escape. It demonstrates my skills in object-oriented programming, game design, and user interface development.
+ * Input: Keyboard and mouse inputs for player movement, shooting, reloading, and interactions.
+ * Process: The game processes player input, updates game elements, checks for collisions, and renders the game world each frame.
+ * Output: A graphical window displaying the game world, player status, score, and time elapsed, as well as game sound effects.
  */
 
 // Import statements
@@ -18,11 +23,25 @@ public class Game extends JPanel
         implements ActionListener, KeyListener, MouseListener {
 
     // Define constants
+    static final String FRAME_TITLE = "Apocalypse";
     static final int SCREEN_W = 800;
     static final int SCREEN_H = 600;
     static final int WORLD_W = 10000;
     static final int WORLD_H = 10000;
     static final int TILE = 80;
+    static final int TIMER_DELAY_MS = 16;
+    static final int BUILDING_COUNT = 200;
+    static final int AK_SPAWNER_COUNT = 20;
+    static final int ENEMY_SPAWNER_COUNT = 250;
+    static final int SPAWNER_HALF_SIZE = 30;
+    static final int HELI_SPACING = 300;
+    static final int PLAYER_SIZE = 40;
+    static final int PLAYER_SPACING = 200;
+    static final int PLAYER_START_DIVISOR = 16;
+    static final int HELI_START_MULTIPLIER = 15;
+    static final int HELI_START_DIVISOR = 16;
+    static final int BUILDING_SIZE_MIN_MULT = 2;
+    static final int BUILDING_SIZE_RANGE = 3;
 
     // Define variables
     int camX, camY;
@@ -33,16 +52,16 @@ public class Game extends JPanel
     long startTime = System.currentTimeMillis();
 
     // Initialize objects
-    Timer timer = new Timer(16, this);
+    Timer timer = new Timer(TIMER_DELAY_MS, this);
 
     Player player = new Player(
-        WORLD_W / 16,
-        WORLD_H - (WORLD_H / 16)
+        WORLD_W / PLAYER_START_DIVISOR,
+        WORLD_H - (WORLD_H / PLAYER_START_DIVISOR)
     );
 
     Helicopter helicopter = new Helicopter(
-        WORLD_W * 15 / 16,
-        WORLD_H / 16
+        WORLD_W * HELI_START_MULTIPLIER / HELI_START_DIVISOR,
+        WORLD_H / HELI_START_DIVISOR
     );
 
     Pointer pointer = new Pointer();
@@ -59,7 +78,7 @@ public class Game extends JPanel
     // Game constructor
     public Game() {
         // Configure JFrame
-        frame = new JFrame("Apocalypse");
+        frame = new JFrame(FRAME_TITLE);
 
         setPreferredSize(new Dimension(SCREEN_W, SCREEN_H));
         setFocusable(true);
@@ -74,9 +93,9 @@ public class Game extends JPanel
         frame.setVisible(true);
 
         // Spawn elements
-        spawnBuildings(200);
-        spawnAKs(20);
-        spawnEnemySpawners(500);
+        spawnBuildings(BUILDING_COUNT);
+        spawnAKs(AK_SPAWNER_COUNT);
+        spawnEnemySpawners(ENEMY_SPAWNER_COUNT);
 
         // Set focus and start timer
         requestFocus();
@@ -88,16 +107,13 @@ public class Game extends JPanel
         Random r = new Random();
         // Loop to create spawners
         for (int i = 0; i < amount; i++) {
-            int x, y;
-            boolean validSpawn;
-            do {
-                x = r.nextInt(WORLD_W);
-                y = r.nextInt(WORLD_H);
-                validSpawn = !isSpawnBlocked(x, y, 30);
-            } while (!validSpawn);
-            
+            int x = r.nextInt(WORLD_W);
+            int y = r.nextInt(WORLD_H);
             akSpawners.add(new GunSpawner(x, y));
-        } // End for loop 
+        } // End for loop
+        
+        // Remove any spawners touching buildings
+        akSpawners.removeIf(s -> isSpawnerTouchingBuilding(s.x, s.y));
     } // End method
 
     // Spawn enemy spawners
@@ -105,29 +121,33 @@ public class Game extends JPanel
         Random r = new Random();
         // Loop to create spawners
         for (int i = 0; i < amount; i++) {
-            int x, y;
-            boolean validSpawn;
-            do {
-                x = r.nextInt(WORLD_W);
-                y = r.nextInt(WORLD_H);
-                validSpawn = !isSpawnBlocked(x, y, 30);
-            } while (!validSpawn);
-            
+            int x = r.nextInt(WORLD_W);
+            int y = r.nextInt(WORLD_H);
             enemySpawners.add(new EnemySpawner(x, y));
         } // End for loop
+        
+        // Remove spawners touching buildings or near helicopter
+        enemySpawners.removeIf(es -> isSpawnerTouchingBuilding(es.x, es.y) || isNearHelicopter(es.x, es.y));
     } // End method
 
-    // Check if spawn location is blocked by a building
-    private boolean isSpawnBlocked(int x, int y, int size) {
-        // Check collision with buildings
+    // Check if spawner is touching a building
+    private boolean isSpawnerTouchingBuilding(int x, int y) {
         for (Building b : buildings) {
-            int halfSize = size / 2;
-            if (x + halfSize > b.x && x - halfSize < b.x + b.width &&
-                y + halfSize > b.y && y - halfSize < b.y + b.height) {
+            if (x + SPAWNER_HALF_SIZE > b.x && x - SPAWNER_HALF_SIZE < b.x + b.width &&
+                y + SPAWNER_HALF_SIZE > b.y && y - SPAWNER_HALF_SIZE < b.y + b.height) {
                 return true;
             }
         } // End for loop
         return false;
+    } // End method
+
+    // Check if spawner is near helicopter
+    private boolean isNearHelicopter(int x, int y) {
+        int heliX = helicopter.x;
+        int heliY = helicopter.y;
+        int heliSize = helicopter.size;
+        return x + SPAWNER_HALF_SIZE > heliX - HELI_SPACING && x - SPAWNER_HALF_SIZE < heliX + heliSize + HELI_SPACING &&
+               y + SPAWNER_HALF_SIZE > heliY - HELI_SPACING && y - SPAWNER_HALF_SIZE < heliY + heliSize + HELI_SPACING;
     } // End method
 
     // Spawn random buildings on map
@@ -135,19 +155,30 @@ public class Game extends JPanel
         Random r = new Random();
         // Loop to create buildings
         for (int i = 0; i < amount; i++) {
-            int size = (r.nextInt(3) + 2) * TILE;
+            int size = (r.nextInt(BUILDING_SIZE_RANGE) + BUILDING_SIZE_MIN_MULT) * TILE;
             int x, y;
             boolean validSpawn;
             do {
                 x = r.nextInt(WORLD_W - size);
                 y = r.nextInt(WORLD_H - size);
                 // Check if building would spawn near player spawn location
-                int playerSpawnX = WORLD_W / 16;
-                int playerSpawnY = WORLD_H - (WORLD_H / 16);
-                int playerSize = 40;
-                int spacing = 200; // Safe spacing around player spawn
-                validSpawn = !(x + size > playerSpawnX - spacing && x < playerSpawnX + playerSize + spacing &&
-                               y + size > playerSpawnY - spacing && y < playerSpawnY + playerSize + spacing);
+                int playerSpawnX = WORLD_W / PLAYER_START_DIVISOR;
+                int playerSpawnY = WORLD_H - (WORLD_H / PLAYER_START_DIVISOR);
+                int playerSize = PLAYER_SIZE;
+                int playerSpacing = PLAYER_SPACING; // Safe spacing around player spawn
+
+                // Avoid overlapping the player spawn area
+                validSpawn = !(x + size > playerSpawnX - playerSpacing && x < playerSpawnX + playerSize + playerSpacing &&
+                               y + size > playerSpawnY - playerSpacing && y < playerSpawnY + playerSize + playerSpacing);
+
+                // Avoid overlapping the helicopter extraction area
+                if (validSpawn) {
+                    int heliX = helicopter.x;
+                    int heliY = helicopter.y;
+                    int heliSize = helicopter.size;
+                    validSpawn = !(x + size > heliX - HELI_SPACING && x < heliX + heliSize + HELI_SPACING &&
+                                   y + size > heliY - HELI_SPACING && y < heliY + heliSize + HELI_SPACING);
+                }
             } while (!validSpawn);
             
             buildings.add(new Building(x, y, size, size));
@@ -229,6 +260,9 @@ public class Game extends JPanel
                 e2.undoMove(oldEnemyX, oldEnemyY);
             }
         } // End for loop
+
+        // Remove boxed-in enemies
+        enemies.removeIf(enemy -> enemy.isStuckInBuilding(buildings));
 
         // Handle automatic firing
         if (mouseDown) {

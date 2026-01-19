@@ -11,6 +11,9 @@ import java.awt.*;
 
 // Building class
 public class Building {
+    // Constants
+    static final Color COLOR_FILL = new Color(80, 80, 80);
+    static final Color COLOR_BORDER = new Color(60, 60, 60);
     
     // Position and dimensions
     int x, y;
@@ -39,11 +42,11 @@ public class Building {
     // Draw building
     void draw(Graphics g, int camX, int camY) {
         // Draw building fill
-        g.setColor(new Color(80, 80, 80));
+        g.setColor(COLOR_FILL);
         g.fillRect(x - camX, y - camY, width, height);
         
         // Draw building border
-        g.setColor(new Color(60, 60, 60));
+        g.setColor(COLOR_BORDER);
         g.drawRect(x - camX, y - camY, width, height);
     } // End method
 } // End class

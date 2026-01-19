@@ -11,10 +11,17 @@ import java.awt.*;
 
 // Enemy spawner class
 public class EnemySpawner {
+    // Constants
+    static final int DEFAULT_RADIUS = 400;
+    static final int DEFAULT_COOLDOWN = 120;
+    static final int DRAW_RADIUS = 10;
+    static final int DRAW_DIAMETER = DRAW_RADIUS * 2;
+    static final Color COLOR_SPAWNER = Color.RED;
+
     // Position and spawn parameters
     int x, y;
-    int radius = 400;
-    int cooldown = 120;
+    int radius = DEFAULT_RADIUS;
+    int cooldown = DEFAULT_COOLDOWN;
     int timer = 0;
 
     // Constructor
@@ -50,7 +57,7 @@ public class EnemySpawner {
 
     // Draw spawner
     void draw(Graphics g, int camX, int camY) {
-        g.setColor(Color.RED);
-        g.fillOval(x - 10 - camX, y - 10 - camY, 20, 20);
+        g.setColor(COLOR_SPAWNER);
+        g.fillOval(x - DRAW_RADIUS - camX, y - DRAW_RADIUS - camY, DRAW_DIAMETER, DRAW_DIAMETER);
     } // End method
 } // End class

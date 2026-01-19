@@ -9,9 +9,16 @@
 // Import statements
 import java.awt.*;
 import java.util.*;
+import javax.sound.sampled.*;
+import java.io.*;
 
 // Gun class
 public abstract class Gun {
+    // Constants
+    static final int GUN_STROKE_WIDTH = 6;
+    static final int SOUND_SAMPLE_RATE = 44100;
+    static final int SOUND_DURATION_SAMPLES = SOUND_SAMPLE_RATE / 10;
+    static final int SOUND_MAX_AMPLITUDE = 32767;
     // Gun length for aiming
     int length;
 
@@ -82,6 +89,9 @@ public abstract class Gun {
 
         // Add bullet to list
         bullets.add(new Bullet(spawnX, spawnY, dx, dy));
+        
+        // Play gunshot sound
+        playGunshotSound();
     } // End method
 
     // Auto fire for automatic weapons
@@ -128,8 +138,33 @@ public abstract class Gun {
         int y2 = py + (int)(Math.sin(angle) * length);
 
         // Draw gun barrel
-        g2.setStroke(new BasicStroke(6));
+        g2.setStroke(new BasicStroke(GUN_STROKE_WIDTH));
         g2.setColor(Color.DARK_GRAY);
         g2.drawLine(px, py, x2, y2);
+    } // End method
+
+    // Play gunshot sound
+    private void playGunshotSound() {
+        new Thread(() -> {
+            try {
+                // Generate a simple beep sound as gunshot
+                Clip clip = AudioSystem.getClip();
+                AudioFormat format = new AudioFormat(SOUND_SAMPLE_RATE, 16, 1, true, false);
+                byte[] data = new byte[SOUND_DURATION_SAMPLES];
+                
+                // Generate simple gunshot-like sound (white noise pulse)
+                for (int i = 0; i < data.length; i++) {
+                    int sample = (int)(Math.random() * SOUND_MAX_AMPLITUDE * (1.0 - i / (double)data.length));
+                    data[i] = (byte)sample;
+                }
+                
+                ByteArrayInputStream bais = new ByteArrayInputStream(data);
+                AudioInputStream ais = new AudioInputStream(bais, format, data.length);
+                clip.open(ais);
+                clip.start();
+            } catch (Exception e) {
+                // Silently fail if sound cannot be played
+            }
+        }).start();
     } // End method
 }

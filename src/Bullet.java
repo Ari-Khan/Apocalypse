@@ -11,14 +11,21 @@ import java.awt.*;
 
 // Bullet class
 public class Bullet {
+    // Constants
+    static final int SPEED = 20;
+    static final int LIFE_TICKS = 120;
+    static final int DRAW_RADIUS = 3;
+    static final int DRAW_DIAMETER = DRAW_RADIUS * 2;
+    static final Color COLOR_BULLET = Color.YELLOW;
+
     // Position
     double x, y;
     // Velocity components
     double vx, vy;
 
     // Speed and lifespan
-    int speed = 20;
-    int life = 120;
+    int speed = SPEED;
+    int life = LIFE_TICKS;
 
     // Constructor
     public Bullet(int x, int y, double dx, double dy) {
@@ -43,7 +50,7 @@ public class Bullet {
 
     // Draw bullet
     void draw(Graphics g, int camX, int camY) {
-        g.setColor(Color.YELLOW);
-        g.fillOval((int)x - camX - 3, (int)y - camY - 3, 6, 6);
+        g.setColor(COLOR_BULLET);
+        g.fillOval((int)x - camX - DRAW_RADIUS, (int)y - camY - DRAW_RADIUS, DRAW_DIAMETER, DRAW_DIAMETER);
     } // End method
 } // End class

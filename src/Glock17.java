@@ -9,13 +9,19 @@
 // Glock17 class
 public class Glock17 extends Gun {
 
+    // Constants
+    static final int GLOCK_LENGTH = 30;
+    static final int GLOCK_MAG_SIZE = 17;
+    static final int GLOCK_FIRE_DELAY = 8;
+    static final int GLOCK_RELOAD_TIME = 60;
+
     // Initialize Glock17 weapon stats
     @Override
     protected void initStats() {
-        length = 30;
-        magSize = 17;
-        fireDelay = 8;
-        reloadTime = 60;
+        length = GLOCK_LENGTH;
+        magSize = GLOCK_MAG_SIZE;
+        fireDelay = GLOCK_FIRE_DELAY;
+        reloadTime = GLOCK_RELOAD_TIME;
         automatic = false;
     } // End method
 } // End class

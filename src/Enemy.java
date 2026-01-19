@@ -11,15 +11,29 @@ import java.awt.*;
 
 // Enemy class
 public class Enemy {
+    // Constants
+    static final int BASE_SIZE = 30;
+    static final int BASE_SPEED = 4;
+    static final int BASE_MAX_HEALTH = 2;
+    static final int GENERATION_LIMIT = 3;
+    static final int SIZE_DECREMENT_PER_GEN = 5;
+    static final int SPEED_INCREMENT_PER_GEN = 1;
+    static final int SPAWN_CHILD_COUNT_BASE = 4;
+    static final int HEALTH_BAR_HEIGHT = 5;
+    static final int HEALTH_BAR_OFFSET_Y = 10;
+    static final Color COLOR_BODY = Color.RED;
+    static final Color COLOR_HEALTH_BG = Color.BLACK;
+    static final Color COLOR_HEALTH_FILL = Color.GREEN;
+
     // Position
     int x, y;
-    int size = 30;
+    int size = BASE_SIZE;
 
     // Movement
-    int speed = 4;
+    int speed = BASE_SPEED;
 
     // Health
-    int maxHealth = 2;
+    int maxHealth = BASE_MAX_HEALTH;
     int health = maxHealth;
     int generation = 0;
 
@@ -34,10 +48,10 @@ public class Enemy {
         this.x = x;
         this.y = y;
         this.generation = generation;
-        this.size = 30 - (generation * 5);
-        this.maxHealth = Math.max(1, 2 - generation);
+        this.size = BASE_SIZE - (generation * SIZE_DECREMENT_PER_GEN);
+        this.maxHealth = Math.max(1, BASE_MAX_HEALTH - generation);
         this.health = maxHealth;
-        this.speed = 3 + generation;
+        this.speed = (BASE_SPEED - 1) + (generation * SPEED_INCREMENT_PER_GEN);
     } // End constructor
 
     // Update enemy movement toward player
@@ -92,11 +106,11 @@ public class Enemy {
     // Spawn child enemies around this enemy
     void spawnChildren(java.util.ArrayList<Enemy> enemies, int depth) {
         // Check recursion limit
-        if (depth <= 0 || generation >= 3) {
+        if (depth <= 0 || generation >= GENERATION_LIMIT) {
             return;
         }
 
-        int count = Math.max(1, 4 - generation);
+        int count = Math.max(1, SPAWN_CHILD_COUNT_BASE - generation);
         spawnChildrenRecursive(enemies, count, 0, generation + 1);
     } // End method
 
@@ -124,7 +138,7 @@ public class Enemy {
     // Draw enemy
     void draw(Graphics g, int camX, int camY) {
         // Draw enemy body
-        g.setColor(Color.RED);
+        g.setColor(COLOR_BODY);
         g.fillOval(
             x - size / 2 - camX,
             y - size / 2 - camY,
@@ -133,22 +147,34 @@ public class Enemy {
         );
 
         // Draw health bar background
-        g.setColor(Color.BLACK);
+        g.setColor(COLOR_HEALTH_BG);
         g.drawRect(
             x - size / 2 - camX,
-            y - size / 2 - 10 - camY,
+            y - size / 2 - HEALTH_BAR_OFFSET_Y - camY,
             size,
-            5
+            HEALTH_BAR_HEIGHT
         );
 
         // Draw health bar
-        g.setColor(Color.GREEN);
+        g.setColor(COLOR_HEALTH_FILL);
         int hpWidth = (int) (size * (health / (double) maxHealth));
         g.fillRect(
             x - size / 2 - camX,
-            y - size / 2 - 10 - camY,
+            y - size / 2 - HEALTH_BAR_OFFSET_Y - camY,
             hpWidth,
-            5
+            HEALTH_BAR_HEIGHT
         );
+    } // End method
+
+    // Check if enemy is stuck inside a building
+    boolean isStuckInBuilding(java.util.ArrayList<Building> buildings) {
+        // Check if enemy is overlapping with a building
+        for (Building b : buildings) {
+            if (x + size / 2 > b.x && x - size / 2 < b.x + b.width &&
+                y + size / 2 > b.y && y - size / 2 < b.y + b.height) {
+                return true;
+            }
+        } // End for loop
+        return false;
     } // End method
 } // End class
