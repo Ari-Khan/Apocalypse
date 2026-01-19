@@ -26,6 +26,31 @@ public class EnemySpawner {
         timer = cooldown;
     }
 
+    void update(int px, int py, java.util.ArrayList<Enemy> enemies, java.util.ArrayList<Building> buildings) {
+        if (!isPlayerInRange(px, py)) {
+            return;
+        }
+
+        if (timer > 0) {
+            timer--;
+            return;
+        }
+
+        if (!checkBuildingCollision(buildings)) {
+            enemies.add(new Enemy(x, y));
+        }
+        timer = cooldown;
+    }
+
+    private boolean checkBuildingCollision(java.util.ArrayList<Building> buildings) {
+        for (Building b : buildings) {
+            if (x > b.x && x < b.x + b.width && y > b.y && y < b.y + b.height) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     private boolean isPlayerInRange(int px, int py) {
         int dx = px - x;
         int dy = py - y;

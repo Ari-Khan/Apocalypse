@@ -160,7 +160,10 @@ public class Game extends JPanel
         int oldPlayerX = player.x;
         int oldPlayerY = player.y;
         player.update();
-        player.resolveCollision(buildings, oldPlayerX, oldPlayerY);
+        
+        if (player.checkBuildingCollision(buildings)) {
+            player.undoMove(oldPlayerX, oldPlayerY);
+        }
         
         player.gun.update();
 
@@ -172,7 +175,10 @@ public class Game extends JPanel
             int oldEnemyX = e2.x;
             int oldEnemyY = e2.y;
             e2.update(player.x, player.y);
-            e2.resolveCollision(buildings, oldEnemyX, oldEnemyY);
+            
+            if (e2.checkBuildingCollision(buildings)) {
+                e2.undoMove(oldEnemyX, oldEnemyY);
+            }
         }
 
         if (mouseDown) {
@@ -298,6 +304,14 @@ public class Game extends JPanel
 
         drawTextWithShadow(g, ammo, ax, ay, player.gun.reloading ? Color.YELLOW : Color.WHITE);
 
+        if (player.gun.ammo <= 0 && !player.gun.reloading) {
+            g.setFont(new Font("Monospaced", Font.BOLD, 20));
+            String reloadText = "Press R to Reload";
+            int rx = SCREEN_W - g.getFontMetrics().stringWidth(reloadText) - 20;
+            drawTextWithShadow(g, reloadText, rx, ay - 30, Color.RED);
+            g.setFont(new Font("Monospaced", Font.BOLD, 24));
+        }
+
         long elapsed = System.currentTimeMillis() - startTime;
         long ms = elapsed % 1000;
         long sec = (elapsed / 1000) % 60;
@@ -316,6 +330,11 @@ public class Game extends JPanel
             String msg = "YOU DIED";
             int x = (SCREEN_W - g.getFontMetrics().stringWidth(msg)) / 2;
             drawTextWithShadow(g, msg, x, SCREEN_H / 2, Color.RED);
+            
+            g.setFont(new Font("Monospaced", Font.BOLD, 24));
+            String replay = "Press Y to Replay";
+            int rx = (SCREEN_W - g.getFontMetrics().stringWidth(replay)) / 2;
+            drawTextWithShadow(g, replay, rx, SCREEN_H / 2 + 80, Color.WHITE);
         }
 
         if (escaped) {
@@ -323,6 +342,11 @@ public class Game extends JPanel
             String msg = "ESCAPED!";
             int x = (SCREEN_W - g.getFontMetrics().stringWidth(msg)) / 2;
             drawTextWithShadow(g, msg, x, SCREEN_H / 2, Color.GREEN);
+            
+            g.setFont(new Font("Monospaced", Font.BOLD, 24));
+            String replay = "Press Y to Replay";
+            int rx = (SCREEN_W - g.getFontMetrics().stringWidth(replay)) / 2;
+            drawTextWithShadow(g, replay, rx, SCREEN_H / 2 + 80, Color.WHITE);
         }
     }
 
@@ -344,8 +368,37 @@ public class Game extends JPanel
         mouseDown = false;
     }
 
+    private void restart() {
+        player = new Player(WORLD_W / 16, WORLD_H - (WORLD_H / 16));
+        helicopter = new Helicopter(WORLD_W * 15 / 16, WORLD_H / 16);
+        pointer = new Pointer();
+        akSpawners.clear();
+        enemySpawners.clear();
+        enemies.clear();
+        buildings.clear();
+        
+        score = 0;
+        mouseDown = false;
+        dead = false;
+        escaped = false;
+        startTime = System.currentTimeMillis();
+        
+        spawnAKs(20);
+        spawnEnemySpawners(500);
+        spawnBuildings(30);
+        
+        timer.start();
+    }
+
     @Override
     public void keyPressed(KeyEvent e) {
+        if (e.getKeyCode() == KeyEvent.VK_Y) {
+            if (dead || escaped) {
+                restart();
+                return;
+            }
+        }
+
         player.keyPressed(e);
 
         if (e.getKeyCode() == KeyEvent.VK_R) {

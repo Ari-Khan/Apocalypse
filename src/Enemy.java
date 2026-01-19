@@ -38,23 +38,11 @@ public class Enemy {
         y += (int) (dy / dist * speed);
     }
 
-    void resolveCollision(java.util.ArrayList<Building> buildings, int oldX, int oldY) {
-        if (!checkBuildingCollision(buildings)) {
-            return;
-        }
-        
-        x = oldX;
-        if (!checkBuildingCollision(buildings)) {
-            return;
-        }
-        
-        x = oldX;
-        y = oldY;
-    }
-
     boolean checkBuildingCollision(java.util.ArrayList<Building> buildings) {
         for (Building b : buildings) {
-            if (b.intersects(x, y, size)) {
+            int halfSize = size / 2;
+            if (x + halfSize > b.x && x - halfSize < b.x + b.width &&
+                y + halfSize > b.y && y - halfSize < b.y + b.height) {
                 return true;
             }
         }

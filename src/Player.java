@@ -20,50 +20,37 @@ public class Player {
     }
 
     void update() {
-        int newX = x;
-        int newY = y;
-
         if (up) {
-            newY -= speed;
+            y -= speed;
         }
         if (down) {
-            newY += speed;
+            y += speed;
         }
         if (left) {
-            newX -= speed;
+            x -= speed;
         }
         if (right) {
-            newX += speed;
+            x += speed;
         }
 
-        newX = Math.max(size / 2, Math.min(newX, Game.WORLD_W - size / 2));
-        newY = Math.max(size / 2, Math.min(newY, Game.WORLD_H - size / 2));
-        
-        x = newX;
-        y = newY;
-    }
-
-    void resolveCollision(java.util.ArrayList<Building> buildings, int oldX, int oldY) {
-        if (!checkBuildingCollision(buildings)) {
-            return;
-        }
-        
-        x = oldX;
-        if (!checkBuildingCollision(buildings)) {
-            return;
-        }
-        
-        x = oldX;
-        y = oldY;
+        x = Math.max(size / 2, Math.min(x, Game.WORLD_W - size / 2));
+        y = Math.max(size / 2, Math.min(y, Game.WORLD_H - size / 2));
     }
 
     boolean checkBuildingCollision(java.util.ArrayList<Building> buildings) {
         for (Building b : buildings) {
-            if (b.intersects(x, y, size)) {
+            int halfSize = size / 2;
+            if (x + halfSize > b.x && x - halfSize < b.x + b.width &&
+                y + halfSize > b.y && y - halfSize < b.y + b.height) {
                 return true;
             }
         }
         return false;
+    }
+
+    void undoMove(int oldX, int oldY) {
+        x = oldX;
+        y = oldY;
     }
 
     void draw(Graphics g) {
