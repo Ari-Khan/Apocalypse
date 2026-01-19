@@ -3,8 +3,8 @@ import java.awt.*;
 public class EnemySpawner {
 
     int x, y;
-    int radius = 300;
-    int cooldown = 180;
+    int radius = 400;
+    int cooldown = 120;
     int timer = 0;
 
     public EnemySpawner(int x, int y) {

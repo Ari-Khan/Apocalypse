@@ -6,6 +6,8 @@ public class Player {
     int x, y;
     int size = 40;
     int speed = 6;
+    int maxHealth = 100;
+    int health = maxHealth;
 
     boolean up, down, left, right;
 
