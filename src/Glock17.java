@@ -1,9 +1,11 @@
 public class Glock17 extends Gun {
 
-    public Glock17() {
+    @Override
+    protected void initStats() {
+        length = 30;
         magSize = 17;
-        ammo = magSize;
-        fireDelay = 10;
+        fireDelay = 8;
         reloadTime = 60;
+        automatic = false;
     }
 }

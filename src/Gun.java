@@ -1,9 +1,9 @@
 import java.awt.*;
 import java.util.*;
 
-public class Gun {
+public abstract class Gun {
 
-    int length = 30;
+    int length;
 
     int magSize;
     int ammo;
@@ -11,14 +11,24 @@ public class Gun {
     int fireDelay;
     int fireTimer;
 
+    boolean automatic;
+
     boolean reloading;
     int reloadTime;
     int reloadTimer;
 
     ArrayList<Bullet> bullets = new ArrayList<>();
 
+    public Gun() {
+        initStats();
+        ammo = magSize;
+    }
+
+    protected abstract void initStats();
+
     void update() {
-        if (fireTimer > 0) fireTimer--;
+        if (fireTimer > 0)
+            fireTimer--;
 
         if (reloading) {
             reloadTimer--;
@@ -32,7 +42,8 @@ public class Gun {
     }
 
     void shoot(int x, int y, double dx, double dy) {
-        if (fireTimer > 0 || reloading || ammo <= 0) return;
+        if (fireTimer > 0 || reloading || ammo <= 0)
+            return;
 
         ammo--;
         fireTimer = fireDelay;
@@ -45,8 +56,17 @@ public class Gun {
         bullets.add(new Bullet(spawnX, spawnY, dx, dy));
     }
 
+    void tryAutoFire(int x, int y, double dx, double dy) {
+        if (!automatic)
+            return;
+
+        shoot(x, y, dx, dy);
+    }
+
     void reload() {
-        if (reloading || ammo == magSize) return;
+        if (reloading || ammo == magSize)
+            return;
+
         reloading = true;
         reloadTimer = reloadTime;
     }
