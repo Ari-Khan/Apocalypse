@@ -1,3 +1,11 @@
+/**
+ * Gun.java
+ * Author: Ari Khan
+ * Version: 1.0.0
+ * Date: 2025-01-18
+ * Description: Abstract base class for all weapon types with fire rate, ammo, and reload mechanics.
+ */
+
 import java.awt.*;
 import java.util.*;
 

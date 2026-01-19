@@ -1,3 +1,11 @@
+/**
+ * AK47.java
+ * Author: Ari Khan
+ * Version: 1.0.0
+ * Date: 2025-01-18
+ * Description: Automatic rifle weapon with 30 round magazine.
+ */
+
 public class AK47 extends Gun {
     @Override
     protected void initStats() {

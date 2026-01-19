@@ -1,3 +1,11 @@
+/**
+ * Building.java
+ * Author: Ari Khan
+ * Version: 1.0.0
+ * Date: 2025-01-18
+ * Description: Rectangular obstacles that block player, enemy, and bullet movement.
+ */
+
 import java.awt.*;
 
 public class Building {

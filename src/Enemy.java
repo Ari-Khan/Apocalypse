@@ -1,3 +1,11 @@
+/**
+ * Enemy.java
+ * Author: Ari Khan
+ * Version: 1.0.0
+ * Date: 2025-01-18
+ * Description: Represents enemy entities with recursive spawning mechanics and child enemies.
+ */
+
 import java.awt.*;
 
 public class Enemy {

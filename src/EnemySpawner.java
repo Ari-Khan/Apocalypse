@@ -1,3 +1,11 @@
+/**
+ * EnemySpawner.java
+ * Author: Ari Khan
+ * Version: 1.0.0
+ * Date: 2025-01-18
+ * Description: Enemy generation points that spawn hostile entities when player is in range.
+ */
+
 import java.awt.*;
 
 public class EnemySpawner {

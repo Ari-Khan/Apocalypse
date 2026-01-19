@@ -1,3 +1,11 @@
+/**
+ * Bullet.java
+ * Author: Ari Khan
+ * Version: 1.0.0
+ * Date: 2025-01-18
+ * Description: Class for projectiles fired by the player's gun.
+ */
+
 import java.awt.*;
 
 public class Bullet {

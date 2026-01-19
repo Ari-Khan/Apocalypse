@@ -1,3 +1,11 @@
+/**
+ * Glock17.java
+ * Author: Ari Khan
+ * Version: 1.0.0
+ * Date: 2025-01-18
+ * Description: Semi-automatic pistol weapon with 17 round magazine.
+ */
+
 public class Glock17 extends Gun {
 
     @Override

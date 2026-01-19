@@ -1,3 +1,11 @@
+/**
+ * Helicopter.java
+ * Author: Ari Khan
+ * Version: 1.0.0
+ * Date: 2025-01-18
+ * Description: Extraction point for player escape and game completion.
+ */
+
 import java.awt.*;
 
 public class Helicopter {

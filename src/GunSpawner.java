@@ -1,3 +1,11 @@
+/**
+ * GunSpawner.java
+ * Author: Ari Khan
+ * Version: 1.0.0
+ * Date: 2025-01-18
+ * Description: Crate locations that spawn AK47 rifles for player collection.
+ */
+
 import java.awt.*;
 
 public class GunSpawner {

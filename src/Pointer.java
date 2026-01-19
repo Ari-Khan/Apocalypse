@@ -1,3 +1,11 @@
+/**
+ * Pointer.java
+ * Author: Ari Khan
+ * Version: 1.0.0
+ * Date: 2025-01-18
+ * Description: On-screen navigation arrow that points toward the helicopter.
+ */
+
 import java.awt.*;
 
 public class Pointer {

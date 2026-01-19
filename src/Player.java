@@ -1,3 +1,11 @@
+/**
+ * Player.java
+ * Author: Ari Khan
+ * Version: 1.0.0
+ * Date: 2025-01-18
+ * Description: Represents the player character with movement and health.
+ */
+
 import java.awt.*;
 import java.awt.event.*;
 
