@@ -32,7 +32,7 @@ public class Game extends JPanel
     static final int TIMER_DELAY_MS = 16;
     static final int BUILDING_COUNT = 200;
     static final int AK_SPAWNER_COUNT = 20;
-    static final int ENEMY_SPAWNER_COUNT = 250;
+    static final int ENEMY_SPAWNER_COUNT = 500;
     static final int SPAWNER_HALF_SIZE = 30;
     static final int HELI_SPACING = 300;
     static final int PLAYER_SIZE = 40;
