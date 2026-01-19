@@ -25,7 +25,7 @@ public class GunSpawner {
 
         g.setColor(Color.WHITE);
         g.drawString(
-            "Press K",
+            "Press E",
             x - camX - 18,
             y - camY - size
         );

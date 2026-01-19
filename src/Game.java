@@ -14,6 +14,8 @@ public class Game extends JPanel
     static final int WORLD_H = 10000;
 
     static final int TILE = 80;
+    int score = 0;
+
 
     boolean mouseDown;
     boolean dead = false;
@@ -129,9 +131,10 @@ public class Game extends JPanel
                     e2.health -= 1;
                     bullets.remove(i);
 
-                    if (e2.health <= 0)
+                    if (e2.health <= 0) {
                         enemies.remove(j);
-
+                        score += 10;
+                    }
                     break;
                 }
             }
@@ -224,6 +227,12 @@ public class Game extends JPanel
         int ty = 30;
 
         g.setColor(Color.BLACK);
+        g.drawString("Score: " + score, 22, 62);
+        g.setColor(Color.WHITE);
+        g.drawString("Score: " + score, 20, 60);
+
+
+        g.setColor(Color.BLACK);
         g.drawString(time, tx + 2, ty + 2);
         g.setColor(Color.WHITE);
         g.drawString(time, tx, ty);
@@ -275,7 +284,11 @@ public class Game extends JPanel
                 }
     }
 
-    @Override public void keyReleased(KeyEvent e) { player.keyReleased(e); }
+    @Override
+    public void keyReleased(KeyEvent e) {
+        player.keyReleased(e);
+    }
+
     @Override public void keyTyped(KeyEvent e) {}
     @Override public void mouseClicked(MouseEvent e) {}
     @Override public void mouseEntered(MouseEvent e) {}
