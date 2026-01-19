@@ -32,9 +32,12 @@ public class Game extends JPanel
         WORLD_H / 16
     );
 
+    Pointer pointer = new Pointer();
+
     ArrayList<GunSpawner> akSpawners = new ArrayList<>();
     ArrayList<EnemySpawner> enemySpawners = new ArrayList<>();
     ArrayList<Enemy> enemies = new ArrayList<>();
+    ArrayList<Building> buildings = new ArrayList<>();
 
     static JFrame frame;
 
@@ -55,6 +58,7 @@ public class Game extends JPanel
 
         spawnAKs(20);
         spawnEnemySpawners(500);
+        spawnBuildings(30);
 
         requestFocus();
         timer.start();
@@ -62,20 +66,56 @@ public class Game extends JPanel
 
     void spawnAKs(int amount) {
         Random r = new Random();
-        for (int i = 0; i < amount; i++)
-            akSpawners.add(new GunSpawner(
-                r.nextInt(WORLD_W),
-                r.nextInt(WORLD_H)
-            ));
+        for (int i = 0; i < amount; i++) {
+            int x, y;
+            boolean validSpawn;
+            do {
+                x = r.nextInt(WORLD_W);
+                y = r.nextInt(WORLD_H);
+                validSpawn = !isSpawnBlocked(x, y, 30);
+            } while (!validSpawn);
+            
+            akSpawners.add(new GunSpawner(x, y));
+        }
     }
 
     void spawnEnemySpawners(int amount) {
         Random r = new Random();
-        for (int i = 0; i < amount; i++)
-            enemySpawners.add(new EnemySpawner(
-                r.nextInt(WORLD_W),
-                r.nextInt(WORLD_H)
+        for (int i = 0; i < amount; i++) {
+            int x, y;
+            boolean validSpawn;
+            do {
+                x = r.nextInt(WORLD_W);
+                y = r.nextInt(WORLD_H);
+                validSpawn = !isSpawnBlocked(x, y, 30);
+            } while (!validSpawn);
+            
+            enemySpawners.add(new EnemySpawner(x, y));
+        }
+    }
+
+    private boolean isSpawnBlocked(int x, int y, int size) {
+        for (Building b : buildings) {
+            int halfSize = size / 2;
+            if (x + halfSize > b.x && x - halfSize < b.x + b.width &&
+                y + halfSize > b.y && y - halfSize < b.y + b.height) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    void spawnBuildings(int amount) {
+        Random r = new Random();
+        for (int i = 0; i < amount; i++) {
+            int size = (r.nextInt(3) + 2) * TILE;
+            buildings.add(new Building(
+                r.nextInt(WORLD_W - size),
+                r.nextInt(WORLD_H - size),
+                size,
+                size
             ));
+        }
     }
 
     public static Point getFrameLocation() {
@@ -117,7 +157,11 @@ public class Game extends JPanel
             return;
         }
 
+        int oldPlayerX = player.x;
+        int oldPlayerY = player.y;
         player.update();
+        player.resolveCollision(buildings, oldPlayerX, oldPlayerY);
+        
         player.gun.update();
 
         for (EnemySpawner es : enemySpawners) {
@@ -125,7 +169,10 @@ public class Game extends JPanel
         }
 
         for (Enemy e2 : enemies) {
+            int oldEnemyX = e2.x;
+            int oldEnemyY = e2.y;
             e2.update(player.x, player.y);
+            e2.resolveCollision(buildings, oldEnemyX, oldEnemyY);
         }
 
         if (mouseDown) {
@@ -142,6 +189,17 @@ public class Game extends JPanel
         camY = player.y - SCREEN_H / 2;
 
         ArrayList<Bullet> bullets = player.gun.getBullets();
+
+        for (int i = bullets.size() - 1; i >= 0; i--) {
+            Bullet b = bullets.get(i);
+
+            for (Building building : buildings) {
+                if (building.intersectsPoint(b.x, b.y)) {
+                    bullets.remove(i);
+                    break;
+                }
+            }
+        }
 
         for (int i = bullets.size() - 1; i >= 0; i--) {
             Bullet b = bullets.get(i);
@@ -196,6 +254,10 @@ public class Game extends JPanel
             g.drawLine(-camX, y - camY, WORLD_W - camX, y - camY);
         }
 
+        for (Building building : buildings) {
+            building.draw(g, camX, camY);
+        }
+
         for (Bullet b : player.gun.getBullets()) {
             b.draw(g, camX, camY);
         }
@@ -244,6 +306,10 @@ public class Game extends JPanel
         String time = String.format("%02d:%02d.%03d", min, sec, ms);
         drawTextWithShadow(g, time, 20, 30, Color.WHITE);
         drawTextWithShadow(g, "Score: " + score, 20, 60, Color.WHITE);
+
+        if (!escaped) {
+            pointer.draw(g, player.x, player.y, helicopter.x, helicopter.y, SCREEN_W, SCREEN_H);
+        }
 
         if (dead) {
             g.setFont(new Font("Monospaced", Font.BOLD, 48));
