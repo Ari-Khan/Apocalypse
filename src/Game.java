@@ -249,6 +249,10 @@ public class Game extends JPanel
             es.update(player.x, player.y, enemies);
         } // End for loop
 
+        // Remove any spawners touching buildings
+        akSpawners.removeIf(s -> isSpawnerTouchingBuilding(s.x, s.y));
+        enemySpawners.removeIf(es -> isSpawnerTouchingBuilding(es.x, es.y));
+
         // Update enemies
         for (Enemy e2 : enemies) {
             int oldEnemyX = e2.x;
@@ -504,7 +508,7 @@ public class Game extends JPanel
         
         // Spawn elements
         spawnAKs(20);
-        spawnEnemySpawners(500);
+        spawnEnemySpawners(750);
         spawnBuildings(100);
         
         timer.start();

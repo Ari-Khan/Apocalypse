@@ -9,24 +9,22 @@
 import java.awt.*;
 
 // Gun spawner class
-public class GunSpawner {
+public class GunSpawner extends Spawner {
     // Constants
     static final int DEFAULT_SIZE = 30;
     static final int HINT_OFFSET_X = -18;
-    static final int HINT_OFFSET_Y_MULT = -1; // multiplied by size
+    static final int HINT_OFFSET_Y_MULT = -1; 
     static final int NEAR_RANGE = 50;
     static final Color COLOR_SPAWNER = Color.ORANGE;
     static final Color COLOR_HINT = Color.WHITE;
     static final String TEXT_HINT = "Press E";
 
-    // Position and size
-    int x, y;
+    // Size
     int size = DEFAULT_SIZE;
 
     // Constructor
     public GunSpawner(int x, int y) {
-        this.x = x;
-        this.y = y;
+        super(x, y);
     } // End constructor
 
     // Draw gun spawner
@@ -54,14 +52,7 @@ public class GunSpawner {
 
     // Check if player is near spawner
     boolean isNear(int px, int py) {
-        return checkDistance(px, py, NEAR_RANGE);
-    } // End method
-
-    // Check distance between two points
-    private boolean checkDistance(int px, int py, int range) {
-        int dx = px - x;
-        int dy = py - y;
-        return dx * dx + dy * dy < range * range;
+        return withinRange(px, py, NEAR_RANGE);
     } // End method
 
     // Spawn gun at this location

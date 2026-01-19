@@ -10,7 +10,7 @@
 import java.awt.*;
 
 // Enemy spawner class
-public class EnemySpawner {
+public class EnemySpawner extends Spawner {
     // Constants
     static final int DEFAULT_RADIUS = 400;
     static final int DEFAULT_COOLDOWN = 120;
@@ -19,15 +19,13 @@ public class EnemySpawner {
     static final Color COLOR_SPAWNER = Color.RED;
 
     // Position and spawn parameters
-    int x, y;
     int radius = DEFAULT_RADIUS;
     int cooldown = DEFAULT_COOLDOWN;
     int timer = 0;
 
     // Constructor
     public EnemySpawner(int x, int y) {
-        this.x = x;
-        this.y = y;
+        super(x, y);
     } // End constructor
 
     // Update spawner and create enemies
@@ -50,9 +48,7 @@ public class EnemySpawner {
 
     // Check if player is in spawn range
     private boolean isPlayerInRange(int px, int py) {
-        int dx = px - x;
-        int dy = py - y;
-        return dx * dx + dy * dy <= radius * radius;
+        return withinRange(px, py, radius);
     } // End method
 
     // Draw spawner
