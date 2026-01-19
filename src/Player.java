@@ -20,10 +20,18 @@ public class Player {
     }
 
     void update() {
-        if (up) y -= speed;
-        if (down) y += speed;
-        if (left) x -= speed;
-        if (right) x += speed;
+        if (up) {
+            y -= speed;
+        }
+        if (down) {
+            y += speed;
+        }
+        if (left) {
+            x -= speed;
+        }
+        if (right) {
+            x += speed;
+        }
 
         x = Math.max(size / 2, Math.min(x, Game.WORLD_W - size / 2));
         y = Math.max(size / 2, Math.min(y, Game.WORLD_H - size / 2));

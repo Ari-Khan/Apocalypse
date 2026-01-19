@@ -9,17 +9,14 @@ public class Game extends JPanel
 
     static final int SCREEN_W = 800;
     static final int SCREEN_H = 600;
-
     static final int WORLD_W = 10000;
     static final int WORLD_H = 10000;
-
     static final int TILE = 80;
+
+    int camX, camY;
     int score = 0;
-
-
     boolean mouseDown;
     boolean dead = false;
-
     long startTime = System.currentTimeMillis();
 
     Timer timer = new Timer(16, this);
@@ -33,7 +30,6 @@ public class Game extends JPanel
     ArrayList<EnemySpawner> enemySpawners = new ArrayList<>();
     ArrayList<Enemy> enemies = new ArrayList<>();
 
-    int camX, camY;
     static JFrame frame;
 
     public Game() {
@@ -80,9 +76,28 @@ public class Game extends JPanel
         return frame.getLocationOnScreen();
     }
 
+    private void drawTextWithShadow(Graphics g, String text, int x, int y, Color textColor) {
+        g.setColor(Color.BLACK);
+        g.drawString(text, x + 2, y + 2);
+        g.setColor(textColor);
+        g.drawString(text, x, y);
+    }
+
+    private boolean checkCircleCollision(double x1, double y1, double r1, double x2, double y2, double r2) {
+        double dx = x1 - x2;
+        double dy = y1 - y2;
+        double totalRadius = r1 + r2;
+        return dx * dx + dy * dy < totalRadius * totalRadius;
+    }
+
+    private Point getMouseWorldCoordinates() {
+        Point m = MouseInfo.getPointerInfo().getLocation();
+        Point f = getFrameLocation();
+        return new Point(m.x - f.x + camX, m.y - f.y + camY);
+    }
+
     @Override
     public void actionPerformed(ActionEvent e) {
-
         if (player.health <= 0) {
             dead = true;
             timer.stop();
@@ -93,28 +108,27 @@ public class Game extends JPanel
         player.update();
         player.gun.update();
 
-        for (EnemySpawner es : enemySpawners)
+        for (EnemySpawner es : enemySpawners) {
             es.update(player.x, player.y, enemies);
+        }
 
-        for (Enemy e2 : enemies)
+        for (Enemy e2 : enemies) {
             e2.update(player.x, player.y);
+        }
 
         if (mouseDown) {
-            Point m = MouseInfo.getPointerInfo().getLocation();
-            Point f = getFrameLocation();
-
+            Point worldMouse = getMouseWorldCoordinates();
             player.gun.tryAutoFire(
                 player.x,
                 player.y,
-                m.x - f.x + camX - player.x,
-                m.y - f.y + camY - player.y
+                worldMouse.x - player.x,
+                worldMouse.y - player.y
             );
         }
 
         camX = player.x - SCREEN_W / 2;
         camY = player.y - SCREEN_H / 2;
 
-        // BULLET → ENEMY DAMAGE
         ArrayList<Bullet> bullets = player.gun.getBullets();
 
         for (int i = bullets.size() - 1; i >= 0; i--) {
@@ -123,11 +137,7 @@ public class Game extends JPanel
             for (int j = enemies.size() - 1; j >= 0; j--) {
                 Enemy e2 = enemies.get(j);
 
-                double dx = b.x - e2.x;
-                double dy = b.y - e2.y;
-                double r = e2.size / 2.0;
-
-                if (dx * dx + dy * dy < r * r) {
+                if (checkCircleCollision(b.x, b.y, 3, e2.x, e2.y, e2.size / 2.0)) {
                     e2.health -= 1;
                     bullets.remove(i);
 
@@ -140,15 +150,10 @@ public class Game extends JPanel
             }
         }
 
-        // ENEMY → PLAYER DAMAGE (enemy dies on contact)
         for (int i = enemies.size() - 1; i >= 0; i--) {
             Enemy e2 = enemies.get(i);
 
-            int dx = e2.x - player.x;
-            int dy = e2.y - player.y;
-            int r = (e2.size / 2) + (player.size / 2);
-
-            if (dx * dx + dy * dy < r * r) {
+            if (checkCircleCollision(e2.x, e2.y, e2.size / 2.0, player.x, player.y, player.size / 2.0)) {
                 player.health -= 10;
                 enemies.remove(i);
                 break;
@@ -170,29 +175,33 @@ public class Game extends JPanel
         g.fillRect(-camX, -camY, WORLD_W, WORLD_H);
 
         g.setColor(new Color(120, 110, 85));
-        for (int x = 0; x <= WORLD_W; x += TILE)
+        for (int x = 0; x <= WORLD_W; x += TILE) {
             g.drawLine(x - camX, -camY, x - camX, WORLD_H - camY);
+        }
 
-        for (int y = 0; y <= WORLD_H; y += TILE)
+        for (int y = 0; y <= WORLD_H; y += TILE) {
             g.drawLine(-camX, y - camY, WORLD_W - camX, y - camY);
+        }
 
-        for (Bullet b : player.gun.getBullets())
+        for (Bullet b : player.gun.getBullets()) {
             b.draw(g, camX, camY);
+        }
 
         for (GunSpawner s : akSpawners) {
             s.draw(g, camX, camY);
             s.drawHint(g, player.x, player.y, camX, camY);
         }
 
-        for (EnemySpawner es : enemySpawners)
+        for (EnemySpawner es : enemySpawners) {
             es.draw(g, camX, camY);
+        }
 
-        for (Enemy e2 : enemies)
+        for (Enemy e2 : enemies) {
             e2.draw(g, camX, camY);
+        }
 
         player.draw(g);
 
-        // HEALTH BAR
         int barW = 120;
         int barH = 12;
         int hx = 20;
@@ -205,50 +214,26 @@ public class Game extends JPanel
         int hpW = (int) (barW * (player.health / (double) player.maxHealth));
         g.fillRect(hx, hy, hpW, barH);
 
-        // AMMO
         String ammo = player.gun.ammo + " / " + player.gun.magSize;
         int ax = SCREEN_W - g.getFontMetrics().stringWidth(ammo) - 20;
         int ay = SCREEN_H - 20;
 
-        g.setColor(Color.BLACK);
-        g.drawString(ammo, ax + 2, ay + 2);
+        drawTextWithShadow(g, ammo, ax, ay, player.gun.reloading ? Color.YELLOW : Color.WHITE);
 
-        g.setColor(player.gun.reloading ? Color.YELLOW : Color.WHITE);
-        g.drawString(ammo, ax, ay);
-
-        // TIMER
         long elapsed = System.currentTimeMillis() - startTime;
         long ms = elapsed % 1000;
         long sec = (elapsed / 1000) % 60;
         long min = elapsed / 60000;
 
         String time = String.format("%02d:%02d.%03d", min, sec, ms);
-        int tx = 20;
-        int ty = 30;
+        drawTextWithShadow(g, time, 20, 30, Color.WHITE);
+        drawTextWithShadow(g, "Score: " + score, 20, 60, Color.WHITE);
 
-        g.setColor(Color.BLACK);
-        g.drawString("Score: " + score, 22, 62);
-        g.setColor(Color.WHITE);
-        g.drawString("Score: " + score, 20, 60);
-
-
-        g.setColor(Color.BLACK);
-        g.drawString(time, tx + 2, ty + 2);
-        g.setColor(Color.WHITE);
-        g.drawString(time, tx, ty);
-
-        // YOU DIED
         if (dead) {
             g.setFont(new Font("Monospaced", Font.BOLD, 48));
             String msg = "YOU DIED";
-
             int x = (SCREEN_W - g.getFontMetrics().stringWidth(msg)) / 2;
-            int y = SCREEN_H / 2;
-
-            g.setColor(Color.BLACK);
-            g.drawString(msg, x + 3, y + 3);
-            g.setColor(Color.RED);
-            g.drawString(msg, x, y);
+            drawTextWithShadow(g, msg, x, SCREEN_H / 2, Color.RED);
         }
     }
 
@@ -256,32 +241,36 @@ public class Game extends JPanel
     public void mousePressed(MouseEvent e) {
         mouseDown = true;
 
-        Point m = MouseInfo.getPointerInfo().getLocation();
-        Point f = getFrameLocation();
-
+        Point worldMouse = getMouseWorldCoordinates();
         player.gun.shoot(
             player.x,
             player.y,
-            m.x - f.x + camX - player.x,
-            m.y - f.y + camY - player.y
+            worldMouse.x - player.x,
+            worldMouse.y - player.y
         );
     }
 
-    @Override public void mouseReleased(MouseEvent e) { mouseDown = false; }
+    @Override
+    public void mouseReleased(MouseEvent e) {
+        mouseDown = false;
+    }
 
     @Override
     public void keyPressed(KeyEvent e) {
         player.keyPressed(e);
 
-        if (e.getKeyCode() == KeyEvent.VK_R)
+        if (e.getKeyCode() == KeyEvent.VK_R) {
             player.gun.reload();
+        }
 
-        if (e.getKeyCode() == KeyEvent.VK_E)
-            for (GunSpawner s : akSpawners)
+        if (e.getKeyCode() == KeyEvent.VK_E) {
+            for (GunSpawner s : akSpawners) {
                 if (s.isNear(player.x, player.y)) {
                     player.gun = s.spawnGun();
                     break;
                 }
+            }
+        }
     }
 
     @Override

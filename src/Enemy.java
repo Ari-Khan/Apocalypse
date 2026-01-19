@@ -35,6 +35,13 @@ public class Enemy {
         return health <= 0;
     }
 
+    boolean checkCollision(int otherX, int otherY, int otherSize) {
+        int dx = otherX - x;
+        int dy = otherY - y;
+        int totalRadius = (size / 2) + (otherSize / 2);
+        return dx * dx + dy * dy < totalRadius * totalRadius;
+    }
+
     void draw(Graphics g, int camX, int camY) {
         g.setColor(Color.RED);
         g.fillOval(

@@ -13,11 +13,9 @@ public class EnemySpawner {
     }
 
     void update(int px, int py, java.util.ArrayList<Enemy> enemies) {
-        int dx = px - x;
-        int dy = py - y;
-
-        if (dx * dx + dy * dy > radius * radius)
+        if (!isPlayerInRange(px, py)) {
             return;
+        }
 
         if (timer > 0) {
             timer--;
@@ -26,6 +24,12 @@ public class EnemySpawner {
 
         enemies.add(new Enemy(x, y));
         timer = cooldown;
+    }
+
+    private boolean isPlayerInRange(int px, int py) {
+        int dx = px - x;
+        int dy = py - y;
+        return dx * dx + dy * dy <= radius * radius;
     }
 
     void draw(Graphics g, int camX, int camY) {

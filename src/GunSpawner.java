@@ -32,9 +32,13 @@ public class GunSpawner {
     }
 
     boolean isNear(int px, int py) {
+        return checkDistance(px, py, 50);
+    }
+
+    private boolean checkDistance(int px, int py, int range) {
         int dx = px - x;
         int dy = py - y;
-        return dx * dx + dy * dy < 50 * 50;
+        return dx * dx + dy * dy < range * range;
     }
 
     Gun spawnGun() {

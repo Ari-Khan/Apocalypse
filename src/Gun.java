@@ -27,8 +27,9 @@ public abstract class Gun {
     protected abstract void initStats();
 
     void update() {
-        if (fireTimer > 0)
+        if (fireTimer > 0) {
             fireTimer--;
+        }
 
         if (reloading) {
             reloadTimer--;
@@ -42,8 +43,9 @@ public abstract class Gun {
     }
 
     void shoot(int x, int y, double dx, double dy) {
-        if (fireTimer > 0 || reloading || ammo <= 0)
+        if (fireTimer > 0 || reloading || ammo <= 0) {
             return;
+        }
 
         ammo--;
         fireTimer = fireDelay;
@@ -57,15 +59,17 @@ public abstract class Gun {
     }
 
     void tryAutoFire(int x, int y, double dx, double dy) {
-        if (!automatic)
+        if (!automatic) {
             return;
+        }
 
         shoot(x, y, dx, dy);
     }
 
     void reload() {
-        if (reloading || ammo == magSize)
+        if (reloading || ammo == magSize) {
             return;
+        }
 
         reloading = true;
         reloadTimer = reloadTime;
