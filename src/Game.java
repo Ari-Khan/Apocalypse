@@ -17,6 +17,7 @@ public class Game extends JPanel
     int score = 0;
     boolean mouseDown;
     boolean dead = false;
+    boolean escaped = false;
     long startTime = System.currentTimeMillis();
 
     Timer timer = new Timer(16, this);
@@ -26,6 +27,11 @@ public class Game extends JPanel
         WORLD_H - (WORLD_H / 16)
     );
 
+    Helicopter helicopter = new Helicopter(
+        WORLD_W * 15 / 16,
+        WORLD_H / 16
+    );
+
     ArrayList<GunSpawner> akSpawners = new ArrayList<>();
     ArrayList<EnemySpawner> enemySpawners = new ArrayList<>();
     ArrayList<Enemy> enemies = new ArrayList<>();
@@ -33,7 +39,7 @@ public class Game extends JPanel
     static JFrame frame;
 
     public Game() {
-        frame = new JFrame("Top-Down Wasteland");
+        frame = new JFrame("Apocalypse");
 
         setPreferredSize(new Dimension(SCREEN_W, SCREEN_H));
         setFocusable(true);
@@ -48,7 +54,7 @@ public class Game extends JPanel
         frame.setVisible(true);
 
         spawnAKs(20);
-        spawnEnemySpawners(750);
+        spawnEnemySpawners(500);
 
         requestFocus();
         timer.start();
@@ -105,6 +111,12 @@ public class Game extends JPanel
             return;
         }
 
+        if (escaped) {
+            timer.stop();
+            repaint();
+            return;
+        }
+
         player.update();
         player.gun.update();
 
@@ -142,6 +154,7 @@ public class Game extends JPanel
                     bullets.remove(i);
 
                     if (e2.health <= 0) {
+                        e2.spawnChildren(enemies, 3);
                         enemies.remove(j);
                         score += 10;
                     }
@@ -200,6 +213,9 @@ public class Game extends JPanel
             e2.draw(g, camX, camY);
         }
 
+        helicopter.draw(g, camX, camY);
+        helicopter.drawHint(g, player.x, player.y, camX, camY);
+
         player.draw(g);
 
         int barW = 120;
@@ -235,6 +251,13 @@ public class Game extends JPanel
             int x = (SCREEN_W - g.getFontMetrics().stringWidth(msg)) / 2;
             drawTextWithShadow(g, msg, x, SCREEN_H / 2, Color.RED);
         }
+
+        if (escaped) {
+            g.setFont(new Font("Monospaced", Font.BOLD, 48));
+            String msg = "ESCAPED!";
+            int x = (SCREEN_W - g.getFontMetrics().stringWidth(msg)) / 2;
+            drawTextWithShadow(g, msg, x, SCREEN_H / 2, Color.GREEN);
+        }
     }
 
     @Override
@@ -261,6 +284,12 @@ public class Game extends JPanel
 
         if (e.getKeyCode() == KeyEvent.VK_R) {
             player.gun.reload();
+        }
+
+        if (e.getKeyCode() == KeyEvent.VK_K) {
+            if (helicopter.isNear(player.x, player.y)) {
+                escaped = true;
+            }
         }
 
         if (e.getKeyCode() == KeyEvent.VK_E) {

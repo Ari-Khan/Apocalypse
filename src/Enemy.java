@@ -5,14 +5,25 @@ public class Enemy {
     int x, y;
     int size = 30;
 
-    int speed = 3;
+    int speed = 4;
 
     int maxHealth = 2;
     int health = maxHealth;
+    int generation = 0;
 
     public Enemy(int x, int y) {
         this.x = x;
         this.y = y;
+    }
+
+    public Enemy(int x, int y, int generation) {
+        this.x = x;
+        this.y = y;
+        this.generation = generation;
+        this.size = 30 - (generation * 5);
+        this.maxHealth = Math.max(1, 2 - generation);
+        this.health = maxHealth;
+        this.speed = 3 + generation;
     }
 
     // chase player
@@ -40,6 +51,31 @@ public class Enemy {
         int dy = otherY - y;
         int totalRadius = (size / 2) + (otherSize / 2);
         return dx * dx + dy * dy < totalRadius * totalRadius;
+    }
+
+    void spawnChildren(java.util.ArrayList<Enemy> enemies, int depth) {
+        if (depth <= 0 || generation >= 3) {
+            return;
+        }
+
+        int count = Math.max(1, 4 - generation);
+        spawnChildrenRecursive(enemies, count, 0, generation + 1);
+    }
+
+    private void spawnChildrenRecursive(java.util.ArrayList<Enemy> enemies, int totalCount, int index, int childGen) {
+        if (index >= totalCount) {
+            return;
+        }
+
+        double angleStep = 2 * Math.PI / totalCount;
+        double angle = angleStep * index;
+        int spawnDist = size;
+        int spawnX = x + (int)(Math.cos(angle) * spawnDist);
+        int spawnY = y + (int)(Math.sin(angle) * spawnDist);
+        
+        enemies.add(new Enemy(spawnX, spawnY, childGen));
+        
+        spawnChildrenRecursive(enemies, totalCount, index + 1, childGen);
     }
 
     void draw(Graphics g, int camX, int camY) {
